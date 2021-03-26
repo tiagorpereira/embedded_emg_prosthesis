@@ -34,7 +34,6 @@
 *.app
 *.i*86
 *.x86_64
-*.hex
 
 # Debug files
 *.dSYM/
@@ -44,7 +43,7 @@
 
 # Simulation files
 *.pdsbak
-*.pdsprj.*
+*.pdsprj*
 
 # Kernel Module Compile Results
 *.mod*
