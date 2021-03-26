@@ -57,11 +57,11 @@ def SetAngle(pwm, angle):
 
 def control_callback(data):
 
-    # Prothesis hand open
+    # Prothesis hand close
     if data == Int32(1):
         SetAngle(p, float(minAngle))
 
-    # Prothesis hand close
+    # Prothesis hand open
     elif data == Int32(-1):
         SetAngle(p, float(maxAngle))
 
