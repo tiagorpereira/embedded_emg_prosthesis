@@ -8,7 +8,6 @@ The _'master'_ branch is only for final stable version, usually followed by a re
 
 ## Quick Reference
 
-<<<<<<< HEAD
 ### Commands:
 
 #### Testing prosthesis control
@@ -39,4 +38,3 @@ The _'master'_ branch is only for final stable version, usually followed by a re
 - **documentacao:** Development report for each control point (PC1, PC2, PC3, PC4)
 
 - **referencias:** All references used in the development
->>>>>>> 938f33e02af313d6cf53090e0e0da4e138d99e3e
