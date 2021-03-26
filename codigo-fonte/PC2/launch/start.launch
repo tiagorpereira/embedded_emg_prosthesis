@@ -10,6 +10,10 @@ http://wiki.ros.org/roslaunch/XML
 
 <launch>
     <group ns="emgprot">
+        <node name="adc" pkg="embedded_emg_prosthesis" type="adc.py" output="log" respawn="true" respawn_delay="5"/>
+        <node name="accumulator" pkg="embedded_emg_prosthesis" type="accumulator.py" output="screen" respawn="true" respawn_delay="5"/>
+        <node name="extraction" pkg="embedded_emg_prosthesis" type="extraction.py" output="screen" respawn="true" respawn_delay="5"/>
+        <node name="predictor" pkg="embedded_emg_prosthesis" type="predictor.py" output="screen" respawn="true" respawn_delay="5"/>
         <node name="control" pkg="embedded_emg_prosthesis" type="servo_node.py" output="screen" respawn="true" respawn_delay="5"/>
     </group>
 </launch>
