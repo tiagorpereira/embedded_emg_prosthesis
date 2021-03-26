@@ -4,8 +4,9 @@ import rospy
 
 # Import ROS msgs
 from std_msgs.msg import Float64
-from std_msgs.msg import UInt8
+#from std_msgs.msg import UInt8
 from std_msgs.msg import String
+from std_msgs.msg import Int32
 
 # Import utilities
 import RPi.GPIO as GPIO
@@ -30,7 +31,7 @@ global pulse_range # pulse total range
 servoPIN = 17
 
 # Max/min Angle for open/close prothesys action
-minAngle = 45
+minAngle = 60
 maxAngle = 150
 
 # Ajuste estes valores para obter o intervalo completo do movimento do servo
@@ -50,22 +51,22 @@ def SetAngle(pwm, angle):
     duty = deg_0_duty + (angle/180.0) *  duty_range
     GPIO.output(servoPIN, True)
     pwm.ChangeDutyCycle(duty)
-    time.sleep(1)
-    GPIO.output(servoPIN, False)
-    pwm.ChangeDutyCycle(0)
+    # time.sleep(1)
+    # GPIO.output(servoPIN, False)
+    # pwm.ChangeDutyCycle(0)
 
 def control_callback(data):
 
-    # Prothesis hand open
-    if data == UInt8(1):
+    # Prothesis hand close
+    if data == Int32(1):
         SetAngle(p, float(minAngle))
 
-    # Prothesis hand close
-    elif data == UInt8(2):
+    # Prothesis hand open
+    elif data == Int32(-1):
         SetAngle(p, float(maxAngle))
 
     # Prothesis hand half open
-    elif data == UInt8(3):
+    elif data == Int32(3):
         SetAngle(p, float(90))
 
 
@@ -85,7 +86,7 @@ def main():
 
     # list subscribed topics
     rospy.loginfo('Setting up topics')
-    sub = rospy.Subscriber('servo/action', UInt8, callback=control_callback)
+    sub = rospy.Subscriber('servo/action', Int32, callback=control_callback)
     
     rospy.spin()
     p.stop()

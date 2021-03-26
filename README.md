@@ -8,21 +8,10 @@ The _'master'_ branch is only for final stable version, usually followed by a re
 
 ## Quick Reference
 
-### Commands:
-
-#### Testing prosthesis control
-**`roslaunch embedded_emg_prosthesis servo_test.launch`**
-- Open hand **`rostopic pub /emgprot/servo/action std_msgs/UInt8 1`**
-- Close hand **`rostopic pub /emgprot/servo/action std_msgs/UInt8 2`**
-
-#### Testing emg processing
-
-
-#### Full test
-
-
 ### Structure:
 
-- **launch:** includes ROS launch files
+- **codigo-fonte:** Main code to run the final project
 
-- **scripts:** contains ROS node files and auxiliary modules
+- **documentacao:** Development report for each control point (PC1, PC2, PC3, PC4)
+
+- **referencias:** All references used in the development
