@@ -67,11 +67,13 @@ void setConfig(){
 unsigned int readAnalog(){
 	unsigned char readBuf[2] = {0};
 	unsigned int valor;
+	int leitura;
 	writeBuf[0] = 0x00;
 	write(i2cFile, writeBuf, 1);
-	if(read(i2cFile, readBuf, 2) != 2) // read data and check error
+	leitura = read(i2cFile, readBuf, 2);
+	if(leitura != 2) // read data and check error
 	{
-		printf("Erro I2C \n");
+		printf("Erro I2C %d\n",leitura);
 	}
 	else
 	{
