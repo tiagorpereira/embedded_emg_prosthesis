@@ -10,7 +10,7 @@
 #include <termios.h>
 #include <MQTTClient.h>
 #include <time.h>
-#include "ads1015.h"
+
 /*
 * Defines
 */
@@ -65,10 +65,8 @@ void publish(MQTTClient client, char* topic, char* payload) {
 
 void capturaDados(){
     char n[10];
-    unsigned int dados;
-
-    dados = readAnalog();
-    sprintf(n,"%d",dados);
+    i=(i+1)%200;
+    sprintf(n,"%d",i);
     publish(client, MQTT_PUBLISH_TOPIC, n);
     k++;
     t=time(NULL);
@@ -99,9 +97,6 @@ int main(int argc, char *argv[])
 
     signal(SIGALRM,capturaDados);
     ualarm(TEMPO,TEMPO);
-    openI2CBus("/dev/i2c-1");
-    setI2CSlave(0x48);
-    setConfig();
    while(1)
    {
        
