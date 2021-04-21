@@ -7,6 +7,8 @@
 #include <unistd.h>
 #include <signal.h>
 #include <fcntl.h>
+#include <linux/i2c-dev.h>
+#include <sys/ioctl.h>
 #include <termios.h>
 #include <MQTTClient.h>
 #include <time.h>
@@ -67,7 +69,7 @@ void capturaDados(){
     char n[10];
     unsigned int dados;
 
-    dados = readVoltage(0);
+    dados = readAnalog();
     sprintf(n,"%d",dados);
     publish(client, MQTT_PUBLISH_TOPIC, n);
     k++;
@@ -106,7 +108,7 @@ int main(int argc, char *argv[])
         exit(-1);
     }
     setI2CSlave(0x48);
-    //setConfig();
+    setConfig();
    while(1)
    {
        
