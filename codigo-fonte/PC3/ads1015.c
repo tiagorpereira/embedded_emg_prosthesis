@@ -50,6 +50,7 @@ void setConfig(){
 	unsigned int config = 0;
 	config = 	CONFIG_REG_MUX_CHAN_0		|
 				CONFIG_REG_PGA_6_144V  		|
+				CONFIG_REG_OS_SINGLE        |
 				CONFIG_REG_MODE_CONTIN 		|
 				CONFIG_REG_DR_3300SPS 		|
 				CONFIG_REG_CMODE_TRAD 		|
