@@ -55,7 +55,7 @@ CONFIG REGISTER
 int openI2CBus(char *bus);
 int setI2CSlave(unsigned char deviceAddr);
 //float readVoltage(int channel);
-int readVoltage(int channel);
+unsigned int readVoltage(int channel);
 unsigned int readAnalog();
 void setConfig();
 

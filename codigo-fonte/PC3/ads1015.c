@@ -84,21 +84,21 @@ unsigned int readAnalog(){
 	return valor;
 }
 
-int readVoltage(int channel)
+unsigned int readVoltage(int channel)
 {
 	unsigned char readBuf[2] = {0};
 	unsigned int analogVal;
-	//float voltage;
+	float voltage;
 	unsigned int config = 0;
 
-	config = 	CONFIG_REG_MUX_CHAN_0		|
-				CONFIG_REG_PGA_6_144V  		|
+	config = 	CONFIG_REG_OS_SINGLE		|
+				CONFIG_REG_PGA_6_144V 		|
 				CONFIG_REG_MODE_CONTIN 		|
-				CONFIG_REG_DR_3300SPS 		|
+				CONFIG_REG_DR_3300SPS 			|
 				CONFIG_REG_CMODE_TRAD 		|
 				CONFIG_REG_CPOL_ACTIV_LOW 	|
 				CONFIG_REG_CLATCH_NONLATCH 	|
-				CONFIG_REG_CQUE_1CONV;
+				CONFIG_REG_CQUE_NONE;
 
 	void configDevice(unsigned int config)
 	{
@@ -107,7 +107,6 @@ int readVoltage(int channel)
 		writeBuf[2] = config && 0xFF;
 		write(i2cFile, writeBuf, 3);
 		usleep(25);
-		
 	}
 
 	switch (channel) {
@@ -127,7 +126,7 @@ int readVoltage(int channel)
 			printf("Give a channel between 0-3\n");
 	}
 	configDevice(config);
-	usleep(65);
+	//usleep(135000);
 
 	writeBuf[0] = 0x00;
 	write(i2cFile, writeBuf, 1);
