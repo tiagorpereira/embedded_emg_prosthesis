@@ -1,22 +1,25 @@
 /*
-* Includes
-*/
-#include <stdlib.h>
+ ============================================================================
+ Name        : ads1115_example.c
+ Author      : Giovanni Bauermeister
+ Description : Read analog values from potentiometer using ADS1115 and prints to terminal
+ ============================================================================
+ */
+
 #include <stdio.h>
-#include <string.h>
+#include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 #include <signal.h>
-#include <fcntl.h>
 #include <linux/i2c-dev.h>
 #include <sys/ioctl.h>
-#include <termios.h>
-#include <MQTTClient.h>
+#include <fcntl.h>
 #include <time.h>
-#include "ads1015.h"
-/*
-* Defines
-*/
-/* Caso desejar utilizar outro broker MQTT, substitua o endereco abaixo */
+#include <MQTTClient.h>
+#include "ads1115_rpi.h"
+
+#define TEMPO 625
+
 #define MQTT_ADDRESS   "tcp://127.0.0.1:1883"
 /* Substitua este por um ID unico em sua aplicacao */
 #define CLIENTID       "ads"  
@@ -25,29 +28,12 @@
 #define MQTT_PUBLISH_TOPIC     "dados"
 #define MQTT_SUBSCRIBE_TOPIC   "MQTTCClientSubTopic"
 
-#define TEMPO 625
-/*
-*  Variaveis globais
-*/
 MQTTClient client;
 int i=0;
 int k=0;
 int t=0;
 int ant=0;
-/*
-* Prototipos de funcao
-*/
-void publish(MQTTClient client, char* topic, char* payload);
-//int on_message(void *context, char *topicName, int topicLen, MQTTClient_message *message);
 
-/*
-* Implementacoes
-*/
-
-/* Funcao: publicacao de mensagens MQTT
- * Parametros: cleinte MQTT, topico MQTT and payload
- * Retorno: nenhum
-*/
 void publish(MQTTClient client, char* topic, char* payload) {
     MQTTClient_message pubmsg = MQTTClient_message_initializer;
 
@@ -60,15 +46,10 @@ void publish(MQTTClient client, char* topic, char* payload) {
     MQTTClient_waitForCompletion(client, token, 1000L);
 }
 
-/* Funcao: callback de mensagens MQTT recebidas e echo para o broker
- * Parametros: contexto, ponteiro para nome do topico da mensagem recebida, tamanho do nome do topico e mensagem recebida
- * Retorno : 1: sucesso (fixo / nao ha checagem de erro neste exemplo)
-*/
-
 void capturaDados(){
     char n[10];
     unsigned int dados;
-
+	//printf("CH_0 = %d V \n ", readVoltage(0));
     dados = readVoltage(0);
     sprintf(n,"%d",dados);
     publish(client, MQTT_PUBLISH_TOPIC, n);
@@ -82,40 +63,37 @@ void capturaDados(){
     //ualarm(TEMPO,0);
 }
 
-int main(int argc, char *argv[])
-{
-   int rc;
-   int lei;
-   MQTTClient_connectOptions conn_opts = MQTTClient_connectOptions_initializer;
+int main(void) {
 
-   /* Inicializacao do MQTT (conexao & subscribe) */
-   MQTTClient_create(&client, MQTT_ADDRESS, CLIENTID, MQTTCLIENT_PERSISTENCE_NONE, NULL);
-   //MQTTClient_setCallbacks(client, NULL, NULL, on_message, NULL);
+	int rc;
+	int lei;
+	MQTTClient_connectOptions conn_opts = MQTTClient_connectOptions_initializer;
 
-   rc = MQTTClient_connect(client, &conn_opts);
+	/* Inicializacao do MQTT (conexao & subscribe) */
+	MQTTClient_create(&client, MQTT_ADDRESS, CLIENTID, MQTTCLIENT_PERSISTENCE_NONE, NULL);
+	//MQTTClient_setCallbacks(client, NULL, NULL, on_message, NULL);
 
-   if (rc != MQTTCLIENT_SUCCESS)
-   {
-       printf("\n\rFalha na conexao ao broker MQTT. Erro: %d\n", rc);
-       exit(-1);
-   }
+	rc = MQTTClient_connect(client, &conn_opts);
 
-    signal(SIGALRM,capturaDados);
+	if (rc != MQTTCLIENT_SUCCESS)
+	{
+		printf("\n\rFalha na conexao ao broker MQTT. Erro: %d\n", rc);
+		exit(-1);
+	}
+
+	if(openI2CBus("/dev/i2c-1") == -1)
+	{
+		return EXIT_FAILURE;
+	}
+	setI2CSlave(0x48);
+	signal(SIGALRM,capturaDados);
     ualarm(TEMPO,TEMPO);
-    lei=openI2CBus("/dev/i2c-1");
-    if(lei == -1){
-        printf("Erro i2c, fechando programa...");
-        exit(-1);
-    }
-    setI2CSlave(0x48);
-    //setConfig();
-   while(1)
-   {
-       
-       /*
-        * o exemplo opera por "interrupcao" no callback de recepcao de 
-        * mensagens MQTT. Portanto, neste laco principal eh preciso fazer
-        * nada.
-        */
-   }
+	while(1)
+	{
+		//printf("CH_0 = %d V \n ", readVoltage(0));
+		//printf("CH_1 = %.2f V | ", readVoltage(1));
+		//printf("CH_2 = %.2f V \n", readVoltage(2));
+	}
+
+	return EXIT_SUCCESS;
 }
