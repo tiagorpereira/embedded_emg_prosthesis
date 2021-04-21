@@ -67,7 +67,7 @@ void capturaDados(){
     char n[10];
     unsigned int dados;
 
-    dados = readAnalog();
+    dados = readVoltage(0);
     sprintf(n,"%d",dados);
     publish(client, MQTT_PUBLISH_TOPIC, n);
     k++;
@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
         exit(-1);
     }
     setI2CSlave(0x48);
-    setConfig();
+    //setConfig();
    while(1)
    {
        

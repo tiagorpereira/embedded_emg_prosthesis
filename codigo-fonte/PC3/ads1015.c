@@ -83,6 +83,68 @@ unsigned int readAnalog(){
 	}
 	return valor;
 }
+
+int readVoltage(int channel)
+{
+	unsigned char readBuf[2] = {0};
+	unsigned int analogVal;
+	float voltage;
+	unsigned int config = 0;
+
+	config = 	CONFIG_REG_MUX_CHAN_0		|
+				CONFIG_REG_PGA_6_144V  		|
+				CONFIG_REG_MODE_CONTIN 		|
+				CONFIG_REG_DR_3300SPS 		|
+				CONFIG_REG_CMODE_TRAD 		|
+				CONFIG_REG_CPOL_ACTIV_LOW 	|
+				CONFIG_REG_CLATCH_NONLATCH 	|
+				CONFIG_REG_CQUE_1CONV;
+
+	void configDevice(unsigned int config)
+	{
+		writeBuf[0] = 0x01;
+		writeBuf[1] = config >> 8;
+		writeBuf[2] = config && 0xFF;
+		write(i2cFile, writeBuf, 3);
+		usleep(25);
+		
+	}
+
+	switch (channel) {
+		case 0:
+			config |= CONFIG_REG_MUX_CHAN_0;
+			break;
+		case 1:
+			config |= CONFIG_REG_MUX_CHAN_1;
+			break;
+		case 2:
+			config |= CONFIG_REG_MUX_CHAN_2;
+			break;
+		case 3:
+			config |= CONFIG_REG_MUX_CHAN_3;
+			break;
+		default:
+			printf("Give a channel between 0-3\n");
+	}
+	configDevice(config);
+	usleep(65);
+
+	writeBuf[0] = 0x00;
+	write(i2cFile, writeBuf, 1);
+
+	if(read(i2cFile, readBuf, 2) != 2) // read data and check error
+	{
+		printf("Error : Input/Output Error \n");
+	}
+	else
+	{
+		analogVal = readBuf[0] << 8 | readBuf[1];
+		voltage = (float)analogVal*4.096/32767.0;
+	}
+
+	return analogVal * 3;
+}
+
 /*
 float readVoltage(int channel)
 {
