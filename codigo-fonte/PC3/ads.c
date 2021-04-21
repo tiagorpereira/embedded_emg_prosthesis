@@ -83,6 +83,7 @@ void capturaDados(){
 int main(int argc, char *argv[])
 {
    int rc;
+   int lei;
    MQTTClient_connectOptions conn_opts = MQTTClient_connectOptions_initializer;
 
    /* Inicializacao do MQTT (conexao & subscribe) */
@@ -99,7 +100,11 @@ int main(int argc, char *argv[])
 
     signal(SIGALRM,capturaDados);
     ualarm(TEMPO,TEMPO);
-    openI2CBus("/dev/i2c-1");
+    lei=openI2CBus("/dev/i2c-1");
+    if(lei == -1){
+        printf("Erro i2c, fechando programa...");
+        exit(-1);
+    }
     setI2CSlave(0x48);
     setConfig();
    while(1)
