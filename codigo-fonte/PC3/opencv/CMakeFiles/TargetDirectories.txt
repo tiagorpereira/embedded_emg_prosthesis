@@ -1,0 +1,3 @@
+/home/gabriel/projetos/embedded_emg_prosthesis/codigo-fonte/PC3/opencv/CMakeFiles/rebuild_cache.dir
+/home/gabriel/projetos/embedded_emg_prosthesis/codigo-fonte/PC3/opencv/CMakeFiles/lerImagem.dir
+/home/gabriel/projetos/embedded_emg_prosthesis/codigo-fonte/PC3/opencv/CMakeFiles/edit_cache.dir
