@@ -10,8 +10,11 @@
 #include <iostream>
 #include <armadillo>
 
+#include "lib/sigpack/sigpack.h"
+
 using namespace std;
 using namespace arma;
+using namespace sp;
 
 /*
 * Defines
@@ -49,8 +52,31 @@ int counter=0;
  * Parametros: contexto, ponteiro para nome do topico da mensagem recebida, tamanho do nome do topico e mensagem recebida
  * Retorno : 1: sucesso (fixo / nao ha checagem de erro neste exemplo)
 */
-colvec extraction(){
+colvec extraction(colvec x){
     colvec parameters(8,fill::zeros);
+
+    x=x-mean(x);
+    //Valor medio absoluto
+    parameters(0)=mean(abs(x));
+    //Valor RMS
+    parameters(1)=sqrt(sum(square(x))/WINDOW);
+    //Waveform length
+    parameters(2)=sum(abs(diff(x)));
+    //Variancia
+    parameters(3)=var(x);
+    //Average Amplitude Change
+    double Y = 0;
+    for (int i = 0; i < WINDOW - 2; i++)
+    {
+        Y = Y + abs(x(i+1)-x(i));
+    }
+    parameters(4)=Y;
+    //Energia em bandas
+    double tot = norm(x,2);
+    tot = tot*tot;
+    vec b;           // Filter coeffs.
+    b(1) = 4.72490051e-04;
+    std::cout << "Filter coeffs: \n" << b.t() << std::endl;
 
     return parameters;
 }
@@ -62,10 +88,11 @@ int on_message(void *context, char *topicName, int topicLen, MQTTClient_message 
     }
     char* payload = (char*)message->payload;
     window(WINDOW-1)= atoi(payload);
-    printf("%.1f\n",window(WINDOW-1));
+    //printf("%.1f\n",window(WINDOW-1));
     if(counter == WINDOW/2){
         counter = 0;
-
+        colvec parametros = extraction(window);
+        printf("%.1f\n",parametros(3));
     }else
         counter++;
     
