@@ -23,7 +23,7 @@
 #define MQTT_PUBLISH_TOPIC     "prediction"
 #define MQTT_SUBSCRIBE_TOPIC   "MQTTCClientSubTopic"
 
-#define TEMPO 1000000
+#define TEMPO 10000
 /*
 *  Variaveis globais
 */
@@ -75,6 +75,10 @@ void capturaDados(){
         k=0;
     }
     ant=t;
+    for (i = 0; i < 100; i++);
+    i=-1;
+    sprintf(n,"%d",i);
+    publish(client, MQTT_PUBLISH_TOPIC,n);
     //ualarm(TEMPO,0);
 }
 

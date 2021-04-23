@@ -1,4 +1,4 @@
-# Install script for directory: /home/gabriel/projetos/embedded_emg_prosthesis/codigo-fonte/PC3/opencv
+# Install script for directory: /home/ubuntu/git/embedded_emg_prosthesis/codigo-fonte/PC3/opencv
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/gabriel/projetos/embedded_emg_prosthesis/codigo-fonte/PC3/opencv/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/ubuntu/git/embedded_emg_prosthesis/codigo-fonte/PC3/opencv/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

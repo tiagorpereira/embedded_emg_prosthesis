@@ -9,7 +9,7 @@ debug: mqtt_test_client.c
 	gcc mqtt_test_client.c -o debug.out -lpaho-mqtt3c -Wall 
 servo: control.out
 control.out: control.o gpio_dev_mem.o
-	gcc control.o gpio_dev_mem.o -o control.out
+	gcc control.o gpio_dev_mem.o -o control.out -lpaho-mqtt3c -Wall
 control.o: control.c
 	gcc -c control.c
 gpio_dev_mem.o: gpio_dev_mem.c
