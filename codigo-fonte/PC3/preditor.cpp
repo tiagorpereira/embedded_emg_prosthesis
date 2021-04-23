@@ -1,10 +1,6 @@
-/*
-* Includes
-*/
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-//#include <sys/time.h>
 #include <MQTTClient.h>
 #include <time.h>
 #include <iostream>
@@ -21,36 +17,25 @@ using namespace arma;
 using namespace sp;
 using namespace cv;
 using namespace cv::ml;
-/*
-* Defines
-*/
+
 #define WINDOW 800
-/* Caso desejar utilizar outro broker MQTT, substitua o endereco abaixo */
+
 #define MQTT_ADDRESS   "tcp://127.0.0.1:1883"
-/* Substitua este por um ID unico em sua aplicacao */
+
 #define CLIENTID       "test"  
 
-/* Substitua aqui os topicos de publish e subscribe por topicos exclusivos de sua aplicacao */
-<<<<<<< HEAD
+
 #define MQTT_PUBLISH_TOPIC    (char*) "prediction"
 #define MQTT_SUBSCRIBE_TOPIC  (char*) "dados"
-=======
-#define MQTT_PUBLISH_TOPIC     "prediction"
-#define MQTT_SUBSCRIBE_TOPIC   "dados"
->>>>>>> main
 
-/*
-*  Variaveis globais
-*/
+
 MQTTClient client;
 Ptr<SVM> svm = SVM::create();
 
 //int window[WINDOW]={0};
 colvec window(WINDOW,fill::zeros);
 int counter=0;
-/*
-* Prototipos de funcao
-*/
+
 
 double energia(vec b,vec a,colvec x){
     IIR_filt<double, double, double> iir_filt;
@@ -163,7 +148,7 @@ int on_message(void *context, char *topicName, int topicLen, MQTTClient_message 
     }
     char* payload = (char*)message->payload;
     window(WINDOW-1)= atoi(payload);
-    //printf("%.1f\n",window(WINDOW-1));
+    
     if(counter == WINDOW/2){
         counter = 0;
         colvec parametros = extraction(window);
@@ -173,18 +158,11 @@ int on_message(void *context, char *topicName, int topicLen, MQTTClient_message 
         sprintf(n,"%d",(int)predicao);
         char* p = (char*)n;
         publish(client, MQTT_PUBLISH_TOPIC, p);
-        //printf("%.6f | %.6f | %.6f\n",parametros(5),parametros(6),parametros(7));
+        
 
     }else
         counter++;
     
-    
-
-    /* Mostra a mensagem recebida */
-    //printf("Mensagem recebida! \n\rTopico: %s Mensagem: %s\n", topicName, payload);
-
-    /* Faz echo da mensagem recebida */
-    //publish(client, MQTT_PUBLISH_TOPIC, payload);
 
     MQTTClient_freeMessage(&message);
     MQTTClient_free(topicName);
@@ -198,7 +176,7 @@ int main(int argc, char *argv[])
    svm = SVM::load("maquina.xml");
    MQTTClient_connectOptions conn_opts = MQTTClient_connectOptions_initializer;
 
-   /* Inicializacao do MQTT (conexao & subscribe) */
+
    MQTTClient_create(&client, MQTT_ADDRESS, CLIENTID, MQTTCLIENT_PERSISTENCE_NONE, NULL);
    MQTTClient_setCallbacks(client, NULL, NULL, on_message, NULL);
 
@@ -214,10 +192,6 @@ int main(int argc, char *argv[])
     
    while(1)
    {
-       /*
-        * o exemplo opera por "interrupcao" no callback de recepcao de 
-        * mensagens MQTT. Portanto, neste laco principal eh preciso fazer
-        * nada.
-        */
+      
    }
 }
