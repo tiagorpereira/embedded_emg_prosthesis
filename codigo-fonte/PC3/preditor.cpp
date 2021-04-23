@@ -31,8 +31,13 @@ using namespace cv::ml;
 #define CLIENTID       "test"  
 
 /* Substitua aqui os topicos de publish e subscribe por topicos exclusivos de sua aplicacao */
+<<<<<<< HEAD
 #define MQTT_PUBLISH_TOPIC    (char*) "prediction"
 #define MQTT_SUBSCRIBE_TOPIC  (char*) "dados"
+=======
+#define MQTT_PUBLISH_TOPIC     "prediction"
+#define MQTT_SUBSCRIBE_TOPIC   "dados"
+>>>>>>> main
 
 /*
 *  Variaveis globais
@@ -165,7 +170,6 @@ int on_message(void *context, char *topicName, int topicLen, MQTTClient_message 
         cv::Mat param_cv= to_cvmat(parametros);
         param_cv.convertTo(param_cv,CV_32F);
         double predicao = (double) svm->predict(param_cv);
-
         sprintf(n,"%d",(int)predicao);
         char* p = (char*)n;
         publish(client, MQTT_PUBLISH_TOPIC, p);
