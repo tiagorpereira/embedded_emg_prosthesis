@@ -70,13 +70,22 @@ void capturaDados(){
     publish(client, MQTT_PUBLISH_TOPIC,n);
     k++;
     t=time(NULL);
+/*
     if(t-ant == 1){
         printf("Freq: %dHz\n",k);
         k=0;
     }
-    ant=t;
-    for (i = 0; i < 100; i++);
-    i=-1;
+    ant=t;*/
+if(k == 100){
+k=0;
+
+
+   // for (i = 0; i < 100; i++);
+	if(i==1)
+		i=-1;
+	else
+		i=1;
+}    
     sprintf(n,"%d",i);
     publish(client, MQTT_PUBLISH_TOPIC,n);
     //ualarm(TEMPO,0);

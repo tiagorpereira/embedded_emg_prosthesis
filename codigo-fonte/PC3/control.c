@@ -66,7 +66,7 @@ int control_callback(void *context, char *topicName, int topicLen, MQTTClient_me
     // printf("Mensagem recebida! \n\rTopico: %s Mensagem: %s\n", topicName, payload);	
     if (atoi(payload) == 1)
         dutyCyclechange(servo_pin, minAngle, N);
-    else if (atoi(payload) == -1)
+    else if (atoi(payload) == 0)
         dutyCyclechange(servo_pin, maxAngle, N);
     else if (atoi(payload) == 3)
         dutyCyclechange(servo_pin, 0, N);

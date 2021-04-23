@@ -48,7 +48,7 @@ unsigned int readVoltage(int channel)
 {
 	unsigned char readBuf[2] = {0};
 	unsigned int analogVal;
-	float voltage;
+	//float voltage;
 	unsigned int config = 0;
 
 	config = 	CONFIG_REG_OS_SINGLE		|
@@ -97,11 +97,11 @@ unsigned int readVoltage(int channel)
 	}
 	else
 	{
-		analogVal = readBuf[0] << 8 | readBuf[1];
+		analogVal = readBuf[1] << 8 | readBuf[0];
 		//voltage = (float)analogVal*4.096/32767.0;
 	}
 
-	return analogVal * 3;
+	return analogVal ;
 }
 
 
