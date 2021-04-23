@@ -17,13 +17,13 @@
 /* Caso desejar utilizar outro broker MQTT, substitua o endereco abaixo */
 #define MQTT_ADDRESS   "tcp://127.0.0.1:1883"
 /* Substitua este por um ID unico em sua aplicacao */
-#define CLIENTID       "ads"  
+#define CLIENTID       "test"  
 
 /* Substitua aqui os topicos de publish e subscribe por topicos exclusivos de sua aplicacao */
-#define MQTT_PUBLISH_TOPIC     "dados"
+#define MQTT_PUBLISH_TOPIC     "prediction"
 #define MQTT_SUBSCRIBE_TOPIC   "MQTTCClientSubTopic"
 
-#define TEMPO 625
+#define TEMPO 10000
 /*
 *  Variaveis globais
 */
@@ -65,16 +65,29 @@ void publish(MQTTClient client, char* topic, char* payload) {
 
 void capturaDados(){
     char n[10];
-    i=(i+1)%200;
+    i=1;
     sprintf(n,"%d",i);
     publish(client, MQTT_PUBLISH_TOPIC,n);
     k++;
     t=time(NULL);
+/*
     if(t-ant == 1){
         printf("Freq: %dHz\n",k);
         k=0;
     }
-    ant=t;
+    ant=t;*/
+if(k == 100){
+k=0;
+
+
+   // for (i = 0; i < 100; i++);
+	if(i==1)
+		i=-1;
+	else
+		i=1;
+}    
+    sprintf(n,"%d",i);
+    publish(client, MQTT_PUBLISH_TOPIC,n);
     //ualarm(TEMPO,0);
 }
 

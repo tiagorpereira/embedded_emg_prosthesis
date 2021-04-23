@@ -31,8 +31,13 @@ using namespace cv::ml;
 #define CLIENTID       "test"  
 
 /* Substitua aqui os topicos de publish e subscribe por topicos exclusivos de sua aplicacao */
+<<<<<<< HEAD
+#define MQTT_PUBLISH_TOPIC    (char*) "prediction"
+#define MQTT_SUBSCRIBE_TOPIC  (char*) "dados"
+=======
 #define MQTT_PUBLISH_TOPIC     "prediction"
 #define MQTT_SUBSCRIBE_TOPIC   "dados"
+>>>>>>> main
 
 /*
 *  Variaveis globais

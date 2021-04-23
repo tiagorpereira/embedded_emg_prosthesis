@@ -72,7 +72,7 @@ int on_message(void *context, char *topicName, int topicLen, MQTTClient_message 
     char* payload = message->payload;
 
     /* Mostra a mensagem recebida */
-    //printf("Mensagem recebida! \n\rTopico: %s Mensagem: %s\n", topicName, payload);
+    printf("Mensagem recebida! \n\rTopico: %s Mensagem: %s\n", topicName, payload);
 
     /* Faz echo da mensagem recebida */
     //publish(client, MQTT_PUBLISH_TOPIC, payload);

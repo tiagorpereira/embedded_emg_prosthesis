@@ -60,7 +60,7 @@ void capturaDados(){
         k=0;
     }
     ant=t;
-    //ualarm(TEMPO,0);
+     //ualarm(TEMPO,0);
 }
 
 int main(void) {
