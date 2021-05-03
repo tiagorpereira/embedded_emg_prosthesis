@@ -11,7 +11,10 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  genmsg
 )
+
+generate_messages(DEPENDENCIES std_msgs)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -103,7 +106,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
+  INCLUDE_DIRS scripts/libs
 #  LIBRARIES servo_control_pkg
 #  CATKIN_DEPENDS roscpp rospy std_msgs
 #  DEPENDS system_lib
@@ -117,6 +120,7 @@ catkin_package(
 ## Your package locations should be listed before other locations
 include_directories(
   ${catkin_INCLUDE_DIRS}
+  scripts/libs
 )
 
 ## Declare a C++ library
@@ -203,3 +207,21 @@ include_directories(
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+#add_library(ads1115 scripts/libs/ads1115_rpi.c)
+#target_link_libraries(ads1115 ${catkin_LIBRARIES})
+
+# install(
+#   TARGETS ads1115
+#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+#   RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
+# )
+# install(
+#   DIRECTORY scripts/libs/
+#   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+# )
+# FIND_LIBRARY(ADS1115 ads1115_rpi /home/ubuntu/catkin_ws/src/embedded_emg_prosthesis/scripts/libs/)
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I/home/ubuntu/catkin_ws/src/embedded_emg_prosthesis/scripts/libs/")
+#add_executable(adc scripts/adc.cpp)
+#target_link_libraries(adc ${catkin_LIBRARIES})
+
