@@ -163,10 +163,10 @@ int on_message(void *context, char *topicName, int topicLen, MQTTClient_message 
         colvec parametros = extraction(window);
         cv::Mat param_cv= to_cvmat(parametros);
         param_cv.convertTo(param_cv,CV_32F);
-        
+        param_cv=param_cv.t();
         param_cv = transformScaler(param_cv,media,desvio);
-        cout << param_cv.rows << endl;
-        double predicao = (double) svm->predict(param_cv);
+        cout << param_cv << endl;
+        double predicao = (double) svm->predict(param_cv.t());
         sprintf(n,"%d",(int)predicao);
         char* p = (char*)n;
         publish(client, MQTT_PUBLISH_TOPIC, p);
