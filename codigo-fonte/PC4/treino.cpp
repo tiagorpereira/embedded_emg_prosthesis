@@ -252,7 +252,7 @@ int main()
     double precision = (double)(Tp) /(double) (Tp+Fp);
     double recall = (double)(Tp) / (double)(Tp+Fn);
     double f1_score = 2 * (precision*recall) / (precision+recall);
-    
+
     cout << "Acuracia: " << accuracy << endl;
     cout << "Precisao: " << precision << endl;
     cout << "Recall: " << recall << endl;
@@ -260,6 +260,7 @@ int main()
     cout << "Matriz: " << endl;
     cout << Tp <<" "<< Fn << endl;
     cout << Fp <<" "<< Tn << endl;
+    cout << E1_cv.col(5) << endl;
 
     
     return 0;
