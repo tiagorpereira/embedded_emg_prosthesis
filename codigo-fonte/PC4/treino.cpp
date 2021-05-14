@@ -115,6 +115,29 @@ cv::Mat_<double> to_cvmat(const mat &src)
   return cv::Mat_<double>{int(src.n_cols), int(src.n_rows), const_cast<double*>(src.memptr())};
 }
 
+void fitScaler(const cv::Mat matriz,cv::Mat *media,cv::Mat *desvio){
+    cv::Mat meanValue, stdValue;
+    cv::Mat colSTD(1, matriz.rows, CV_64FC1);
+    cv::Mat colMEAN(1, matriz.rows, CV_64FC1);       
+
+    for (int i = 0; i < matriz.rows; i++){           
+        cv::meanStdDev(matriz.row(i), meanValue, stdValue);
+        colSTD.at<double>(i) = stdValue.at<double>(0);
+        colMEAN.at<double>(i) = meanValue.at<double>(0);
+    }
+    *media = colMEAN;
+    *desvio = colSTD;
+}
+
+cv::Mat transformScaler(const cv::Mat matriz,cv::Mat media,cv::Mat desvio){
+    cv::Mat escalonado;
+    matriz.copyTo(escalonado);
+    for (int i = 0; i < matriz.rows; i++){
+        escalonado.row(i)=(escalonado.row(i) - media.at<double>(i))/desvio.at<double>(i);
+    }
+    return escalonado;
+}
+
 int main()
 {
     
@@ -140,13 +163,50 @@ int main()
     colvec t_total = join_cols(t_close,t_opened);
     t_total = join_cols(t_total,t_open);
 
+    cv::Mat E1_cv = to_cvmat(E1);
+    cv::Mat E2_cv = to_cvmat(E2);
+    cv::Mat E3_cv = to_cvmat(E3);
+    cv::Mat t1 = to_cvmat(t_close);
+    cv::Mat t2 = to_cvmat(t_opened);
+    cv::Mat t3 = to_cvmat(t_open);
+    E1_cv.convertTo(E1_cv,CV_32F);
+    E2_cv.convertTo(E2_cv,CV_32F);
+    E3_cv.convertTo(E3_cv,CV_32F);
+    t1.convertTo(t1,CV_32S);
+    t2.convertTo(t2,CV_32S);
+    t3.convertTo(t3,CV_32S);
+    E1_cv = E1_cv.t();
+    E2_cv = E2_cv.t();
+    E3_cv = E3_cv.t();
+    cv::Ptr<cv::ml::TrainData> E1_data=cv::ml::TrainData::create(E1_cv,1,t1);
+    cv::Ptr<cv::ml::TrainData> E2_data=cv::ml::TrainData::create(E2_cv,1,t2);
+    cv::Ptr<cv::ml::TrainData> E3_data=cv::ml::TrainData::create(E3_cv,1,t3);
+    E1_data->setTrainTestSplit(E1_cv.cols * 0.8,true);
+    E2_data->setTrainTestSplit(E2_cv.cols * 0.8,true);
+    E3_data->setTrainTestSplit(E3_cv.cols * 0.8,true);
+    cv::Mat E_f;
+    cv::vconcat(E1_data->getTrainSamples(),E2_data->getTrainSamples(),E_f);
+    cv::vconcat(E_f,E3_data->getTrainSamples(),E_f);
+    E_f=E_f.t();
+    cv::Mat t_f;
+    cv::hconcat(E1_data->getTrainResponses(),E2_data->getTrainResponses(),t_f);
+    cv::hconcat(t_f,E3_data->getTrainResponses(),t_f);
+
     cv::Mat E_cv = to_cvmat(E);
     cv::Mat t_cv = to_cvmat(t_total);
-
     E_cv.convertTo(E_cv,CV_32F);
     t_cv.convertTo(t_cv,CV_32S);
     E_cv=E_cv.t();
 
+    cv::Mat media,desvio;
+    fitScaler(E_f,&media,&desvio);
+    E_f = transformScaler(E_f,media,desvio);
+
+    cv::FileStorage fs("scaler.yml", FileStorage::WRITE);
+    fs << "media" << media;
+    fs << "desvio" << desvio;
+    fs.release();
+    
     cout << "Starting training process" << endl;
     Ptr<SVM> svm = SVM::create();
     svm->setType(SVM::C_SVC);
@@ -154,11 +214,44 @@ int main()
     svm->setKernel(SVM::RBF);
     svm->setTermCriteria(TermCriteria(TermCriteria::MAX_ITER, (int)1e7, 1e-6));
 
-    svm->train(E_cv, COL_SAMPLE, t_cv);
+    //svm->train(E_cv, COL_SAMPLE, t_cv);
+    svm->train(E_f, COL_SAMPLE, t_f);
     svm->save("maquina.xml");
     cout << "Finished training process" << endl;
+    cv::Mat E1_idx = E1_data->getTestSampleIdx();
+    E1_cv = transformScaler(E1_cv,media,desvio);
+    cv::Mat E2_idx = E2_data->getTestSampleIdx();
+    E2_cv = transformScaler(E2_cv,media,desvio);
+    cv::Mat E3_idx = E3_data->getTestSampleIdx();
+    E3_cv = transformScaler(E3_cv,media,desvio);
+    int Tn=0;
+    int Tp=0;
+    int Fn=0;
+    int Fp=0;
+    for (int i = 0; i < E1_idx.cols; i++)
+    {
+        Tp += svm->predict(E1_cv.col(E1_idx.at<int>(i)).t());
+    }
+    for (int i = 0; i < E3_idx.cols; i++)
+    {
+        Tp += svm->predict(E3_cv.col(E3_idx.at<int>(i)).t());
+    }
+    Fn = (E1_cv.cols + E3_cv.cols)-Tp;
+    for (int i = 0; i < E2_idx.cols; i++)
+    {
+        Fp += svm->predict(E2_cv.col(E2_idx.at<int>(i)).t());
+    }
+    Tn = E2_cv.cols - Fp;
+    double accuracy = (double)(Tp+Tn) /(double) (Tp+Fp+Tn+Fn);
+    double precision = (double)(Tp) /(double) (Tp+Fp);
+    double recall = (double)(Tp) / (double)(Tp+Fn);
+    double f1_score = 2 * (precision*recall) / (precision+recall);
+    
+    cout << "Acuracia: " << accuracy << endl;
+    cout << "Precisao: " << precision << endl;
+    cout << "Recall: " << recall << endl;
+    cout << "F1_score: " << f1_score << endl;
 
     
-    
     return 0;
-}
+}   

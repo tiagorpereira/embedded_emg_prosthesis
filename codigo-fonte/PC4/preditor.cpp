@@ -35,7 +35,7 @@ Ptr<SVM> svm = SVM::create();
 //int window[WINDOW]={0};
 colvec window(WINDOW,fill::zeros);
 int counter=0;
-
+cv::Mat media,desvio;
 
 double energia(vec b,vec a,colvec x){
     IIR_filt<double, double, double> iir_filt;
@@ -127,6 +127,15 @@ cv::Mat_<double> to_cvmat(const mat &src)
   return cv::Mat_<double>{int(src.n_cols), int(src.n_rows), const_cast<double*>(src.memptr())};
 }
 
+cv::Mat transformScaler(const cv::Mat matriz,cv::Mat media,cv::Mat desvio){
+    cv::Mat escalonado;
+    matriz.copyTo(escalonado);
+    for (int i = 0; i < matriz.rows; i++){
+        escalonado.row(i)=(escalonado.row(i) - media.at<double>(i))/desvio.at<double>(i);
+    }
+    return escalonado;
+}
+
 void publish(MQTTClient client, char* topic, char* payload) {
     MQTTClient_message pubmsg = MQTTClient_message_initializer;
 
@@ -154,6 +163,7 @@ int on_message(void *context, char *topicName, int topicLen, MQTTClient_message 
         colvec parametros = extraction(window);
         cv::Mat param_cv= to_cvmat(parametros);
         param_cv.convertTo(param_cv,CV_32F);
+        param_cv = transformScaler(param_cv,media,desvio);
         double predicao = (double) svm->predict(param_cv);
         sprintf(n,"%d",(int)predicao);
         char* p = (char*)n;
@@ -174,6 +184,10 @@ int main(int argc, char *argv[])
 {
    int rc;
    svm = SVM::load("maquina.xml");
+   FileStorage fs("scaler.yml", FileStorage::READ);
+   fs["media"] >> media;
+   fs["desvio"] >> desvio;
+
    MQTTClient_connectOptions conn_opts = MQTTClient_connectOptions_initializer;
 
 
