@@ -163,7 +163,9 @@ int on_message(void *context, char *topicName, int topicLen, MQTTClient_message 
         colvec parametros = extraction(window);
         cv::Mat param_cv= to_cvmat(parametros);
         param_cv.convertTo(param_cv,CV_32F);
+        cout << param_cv.size() << endl;
         param_cv = transformScaler(param_cv,media,desvio);
+        cout << param_cv.size() << endl;
         double predicao = (double) svm->predict(param_cv);
         sprintf(n,"%d",(int)predicao);
         char* p = (char*)n;

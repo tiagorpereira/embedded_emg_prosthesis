@@ -6,6 +6,7 @@
 #include <opencv2/ml.hpp>
 #include <armadillo>
 #include "lib/sigpack/sigpack.h"
+#include <time.h>
 using namespace cv;
 using namespace cv::ml;
 using namespace std;
@@ -181,9 +182,13 @@ int main()
     cv::Ptr<cv::ml::TrainData> E1_data=cv::ml::TrainData::create(E1_cv,1,t1);
     cv::Ptr<cv::ml::TrainData> E2_data=cv::ml::TrainData::create(E2_cv,1,t2);
     cv::Ptr<cv::ml::TrainData> E3_data=cv::ml::TrainData::create(E3_cv,1,t3);
-    E1_data->setTrainTestSplit(E1_cv.cols * 0.8,true);
-    E2_data->setTrainTestSplit(E2_cv.cols * 0.8,true);
-    E3_data->setTrainTestSplit(E3_cv.cols * 0.8,true);
+    cv::theRNG().state = time(NULL);
+    E1_data->setTrainTestSplitRatio(0.8,true);
+    E1_data->shuffleTrainTest ();
+    E2_data->setTrainTestSplitRatio(0.8,true);
+    E2_data->shuffleTrainTest ();
+    E3_data->setTrainTestSplitRatio(0.8,true);
+    E3_data->shuffleTrainTest ();
     cv::Mat E_f;
     cv::vconcat(E1_data->getTrainSamples(),E2_data->getTrainSamples(),E_f);
     cv::vconcat(E_f,E3_data->getTrainSamples(),E_f);
@@ -236,12 +241,13 @@ int main()
     {
         Tp += svm->predict(E3_cv.col(E3_idx.at<int>(i)).t());
     }
-    Fn = (E1_cv.cols + E3_cv.cols)-Tp;
+    Fn = (E1_idx.cols + E3_idx.cols)-Tp;
     for (int i = 0; i < E2_idx.cols; i++)
     {
         Fp += svm->predict(E2_cv.col(E2_idx.at<int>(i)).t());
     }
-    Tn = E2_cv.cols - Fp;
+    Tn = E2_idx.cols - Fp;
+    //cv::Mat E4_idx = E1_data->getTestSamples();
     double accuracy = (double)(Tp+Tn) /(double) (Tp+Fp+Tn+Fn);
     double precision = (double)(Tp) /(double) (Tp+Fp);
     double recall = (double)(Tp) / (double)(Tp+Fn);
@@ -251,6 +257,9 @@ int main()
     cout << "Precisao: " << precision << endl;
     cout << "Recall: " << recall << endl;
     cout << "F1_score: " << f1_score << endl;
+    cout << "Matriz: " << endl;
+    cout << Tp <<" "<< Fn << endl;
+    cout << Fp <<" "<< Tn << endl;
 
     
     return 0;
