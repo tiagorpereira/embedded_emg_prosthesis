@@ -12,6 +12,6 @@ The _'master'_ branch is only for final stable version, usually followed by a re
 
 - **codigo-fonte:** Main code to run the final project
 
-- **documentacao:** Development report for each control point (PC1, PC2, PC3, PC4)
+- **documentacao:** Development report for each control point (PC1, PC2, PC3, PC4 e PCFINAL)
 
 - **referencias:** All references used in the development
